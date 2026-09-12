@@ -1,4 +1,4 @@
-# Frontend Challenge Fall '24
+# Frontend Challenge Fall '26
 
 Welcome to the Penn Labs Frontend Challenge!
 
