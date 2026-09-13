@@ -1,22 +1,27 @@
-import { useState } from "react"
-import { Course, courseId, getPrereqsList } from "../types"
+import { useEffect, useRef, useState } from "react"
+
+import { Course, courseId, getPrereqsList, hasMetPrereqs} from "../types"
 
 interface CourseModalProps {
 	course: Course
-	onClose: () => void
-	onAddToCart: (course: Course) => void
-    onRemoveFromCart: (id: string) => void
+	isCompleted: boolean
+	completedCourses: Course[]
 	isInCart: boolean
 	cartFull: boolean
+	onAddToCart: (course: Course) => void
+    onRemoveFromCart: (id: string) => void
+	onMarkCompleted: (course: Course) => void
+	onUnmarkCompleted: (id: string) => void
+	onClose: () => void
 }
 
-export default function CourseModal({ course, onClose, onAddToCart, onRemoveFromCart, isInCart, cartFull }: CourseModalProps) {
-    const [isHoveringButton, setIsHoveringButton] = useState(false)
-    const [isCompleted, setIsCompleted] = useState(false)
-    const prereqs = getPrereqsList(course)
+export default function CourseModal({course, isCompleted, completedCourses, isInCart, cartFull, onAddToCart, onRemoveFromCart, onMarkCompleted, onUnmarkCompleted, onClose}: CourseModalProps) {
 	const crossListed = course["cross-listed"] ?? []
 
-    const handleButtonClick = () => {
+	const prereqs = getPrereqsList(course)
+    const prereqsMet = hasMetPrereqs(course, completedCourses)
+
+	const handleButtonClick = () => {
 		if (isInCart) {
 			onRemoveFromCart(courseId(course))
 			onClose()
@@ -25,60 +30,72 @@ export default function CourseModal({ course, onClose, onAddToCart, onRemoveFrom
 			onClose()
 		}
 	}
-
+    const addButtonDisabled = (cartFull && !isInCart) || (!prereqsMet && !isInCart) || isCompleted
+    const completeButtonDisabled = (!prereqsMet && !isCompleted) || isInCart
+	const [isHoveringButton, setIsHoveringButton] = useState(false)
     const buttonLabel = isInCart
 		? isHoveringButton
 			? "Remove"
 			: "Added!"
-		: cartFull
+		: !prereqsMet
+		? "Missing Prerequisite/s"
+        : cartFull
 		? "Cart Full"
 		: "Add to Cart"
 
+    const dialogRef = useRef<HTMLDialogElement>(null)
+    useEffect(() => {
+        const dialog = dialogRef.current
+        dialog?.showModal()
+        const previousOverflow = document.body.style.overflow
+        document.body.style.overflow = "hidden"
+        return () => {
+            dialog?.close()
+            document.body.style.overflow = previousOverflow
+        }
+    }, [])
+
 	return (
-		<div
-			onClick={onClose}
-			style={{
-				position: "fixed",
-				top: 0,
-				left: 0,
-				width: "100%",
-				height: "100%",
-				backgroundColor: "rgba(0, 0, 0, 0.5)",
-				display: "flex",
-				alignItems: "center",
-				justifyContent: "center",
-				zIndex: 2000,
-			}}
-		>
+        <dialog
+            ref={dialogRef}
+            className="popup-dialog"
+            aria-labelledby="course-title"
+            onCancel={onClose}
+            onClick={(event) => {
+                if (event.target === event.currentTarget) onClose()
+            }}
+        >
 			<div
 				onClick={(e) => e.stopPropagation()}
 				style={{
 					backgroundColor: "#990000",
 					borderRadius: "12px",
-					padding: "2rem",
-					maxWidth: "600px",
-					width: "90%",
 					maxHeight: "80vh",
+					maxWidth: "600px",
 					overflowY: "auto",
+					padding: "2rem",
 					position: "relative",
+                    boxSizing: "border-box",
+					width: "100%"
 				}}
 			>
 				<button
+                    aria-label="Close course details"
 					onClick={onClose}
 					style={{
-						position: "absolute",
-						top: "1rem",
-						right: "1rem",
-						border: "none",
 						background: "none",
-						fontSize: "1.5rem",
+						border: "none",
 						cursor: "pointer",
+						fontSize: "1.5rem",
+						position: "absolute",
+						right: "1rem",
+						top: "1rem"
 					}}
 				>
 					×
 				</button>
 
-				<h2 style={{ marginTop: 0 }}>
+				<h2 id="course-title" style={{ marginTop: 0 }}>
 					{course.dept} {course.number}: {course.title}
 				</h2>
 
@@ -92,23 +109,35 @@ export default function CourseModal({ course, onClose, onAddToCart, onRemoveFrom
 					<p><strong>Cross-listed as:</strong> {crossListed.join(", ")}</p>
 				)}
 
-				<button
-					disabled={cartFull && !isInCart}
-					onMouseEnter={() => setIsHoveringButton(true)}
-					onMouseLeave={() => setIsHoveringButton(false)}
+                <button
+                    disabled={addButtonDisabled}
 					onClick={handleButtonClick}
-					style={{ marginTop: "1rem", padding: "0.5rem 1rem" }}
-				>
-					{buttonLabel}
-				</button>
+                    onMouseEnter={() => setIsHoveringButton(true)}
+                    onMouseLeave={() => setIsHoveringButton(false)}
+                    style={{
+                        marginTop: "1rem",
+                        opacity: addButtonDisabled ? 0.5 : 1,
+						padding: "0.5rem 1rem"
+                    }}
+                >
+                    {buttonLabel}
+                </button>
 
                 <button
-						onClick={() => setIsCompleted(!isCompleted)}
-						style={{ marginLeft: "1rem", padding: "0.5rem 1rem" }}
-					>
-						{isCompleted ? "Completed!" : "Completed?"}
-				</button>
+                    disabled={completeButtonDisabled}
+                    onClick={() => {
+                        isCompleted ? onUnmarkCompleted(courseId(course)) : onMarkCompleted(course)
+                        onClose()
+                    }}
+                    style={{
+                        marginLeft: "1rem",
+						opacity: completeButtonDisabled ? 0.5 : 1,
+                        padding: "0.5rem 1rem"
+                    }}
+                >
+                    {isCompleted ? "Completed!" : "Completed?"}
+                </button>
 			</div>
-		</div>
+		</dialog>
 	)
 }

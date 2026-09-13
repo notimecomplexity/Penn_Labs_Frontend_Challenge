@@ -2,14 +2,13 @@ import { useEffect, useRef } from "react"
 
 import { Course, courseId } from "../types"
 
-interface CartProps {
-	cart: Course[]
-	onRemoveFromCart: (id: string) => void
+interface CompletedCoursesProps {
+	completedCourses: Course[]
+	onUnmarkCompleted: (id: string) => void
 	onClose: () => void
-	onCheckout: () => void
 }
 
-const Cart = ({cart, onRemoveFromCart, onClose, onCheckout}: CartProps) => {
+const CompletedCourses = ({completedCourses, onClose, onUnmarkCompleted}: CompletedCoursesProps) => {
 	const dialogRef = useRef<HTMLDialogElement>(null)
 	useEffect(() => {
 		const dialog = dialogRef.current
@@ -24,7 +23,7 @@ const Cart = ({cart, onRemoveFromCart, onClose, onCheckout}: CartProps) => {
 
 	return (
 		<dialog
-			aria-labelledby="cart-title"
+			aria-labelledby="completed-title"
 			className="popup-dialog"
 			ref={dialogRef}
 			onCancel={onClose}
@@ -32,36 +31,35 @@ const Cart = ({cart, onRemoveFromCart, onClose, onCheckout}: CartProps) => {
 				if (event.target === event.currentTarget) onClose()
 			}}
 		>
-		<div
-			style={{
-				border: "1px solid rgba(0, 0, 0, 0.1)",
-				borderRadius: "4px",
-				marginBottom: "1.5rem",
-				padding: "1rem"
-			}}
-		>
-			<button
-				aria-label="Close cart"
-				onClick={onClose}
-				type="button"
+			<div
 				style={{
-					background: "none",
-					border: "none",
-					float: "right",
-					fontSize: "1.5rem",
+					border: "1px solid rgba(0, 0, 0, 0.1)",
+					borderRadius: "4px",
+					marginBottom: "1.5rem",
+					padding: "1rem"
 				}}
 			>
-				×
-			</button>
+				<button
+					aria-label="Close completed courses"
+					onClick={onClose}
+					type="button"
+					style={{
+						background: "none",
+						border: "none",
+						float: "right",
+						fontSize: "1.5rem",
+					}}
+				>
+					×
+				</button>
 
-			<h2 id="cart-title">
-				Course Cart
-			</h2>
+				<h2 id="completed-title">
+					Completed Courses
+				</h2>
 
-			{cart.length === 0 ? (<p>Your cart is currently empty!</p>) : (
-				<>
+				{completedCourses.length === 0 ? (<p>You haven't completed any courses yet!</p>) : (
 					<ul>
-						{cart.map((course) => (
+						{completedCourses.map((course) => (
 							<li
 								key={courseId(course)}
 								style={{ marginBottom: "0.5rem" }}
@@ -69,8 +67,8 @@ const Cart = ({cart, onRemoveFromCart, onClose, onCheckout}: CartProps) => {
 								{course.dept} {course.number}: {course.title}
 
 								<button
-									aria-label={`Remove ${course.dept} ${course.number}`}
-                                    onClick={() => onRemoveFromCart(courseId(course))}
+									aria-label={`Unmark completed ${course.dept} ${course.number}`}
+                                    onClick={() => onUnmarkCompleted(courseId(course))}
 									style={{
 										background: "none",
 										border: "none",
@@ -82,13 +80,10 @@ const Cart = ({cart, onRemoveFromCart, onClose, onCheckout}: CartProps) => {
 							</li>
 						))}
 					</ul>
-
-					<button onClick={onCheckout}>Checkout</button>
-				</>
-			)}
-		</div>
+				)}
+			</div>
 		</dialog>
 	)
 }
 
-export default Cart
+export default CompletedCourses

@@ -1,67 +1,66 @@
+/* ITC Stone Serif (everything else) */
 @font-face {
 	font-family: "ITC Stone Serif";
 	src: url("./assets/fonts/itcss_r.otf") format("opentype");
-	font-weight: normal;
 	font-style: normal;
+	font-weight: normal;
   }
-  
 @font-face {
 	font-family: "ITC Stone Serif";
 	src: url("./assets/fonts/itcss_i.otf") format("opentype");
-	font-weight: normal;
 	font-style: italic;
+	font-weight: normal;
   }
-  
 @font-face {
 	font-family: "ITC Stone Serif";
 	src: url("./assets/fonts/itcss_b.otf") format("opentype");
-	font-weight: bold;
 	font-style: normal;
+	font-weight: bold;
   }
-  
 @font-face {
 	font-family: "ITC Stone Serif";
 	src: url("./assets/fonts/itcss_bi.otf") format("opentype");
-	font-weight: bold;
 	font-style: italic;
+	font-weight: bold;
   }
+
+/* Monaco (for Checkout) */
+@font-face {
+	font-family: "Monaco";
+	src: url("./assets/fonts/monaco.ttf") format("truetype");
+	font-style: normal;
+	font-weight: normal;
+}
 
 input, textarea, select, button {
 	font-family: inherit;
   }
 
 :root {
+	background-color: #011F5B;
+	color: rgba(255, 255, 255, 0.87);
+
 	font-family: "ITC Stone Serif", Georgia, "Times New Roman", serif;
 	font-optical-sizing: auto;
 	font-style: normal;
+	font-synthesis: none;
+	font-weight: 400;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
 
 	line-height: 1.5;
-	font-weight: 400;
-
-	color: rgba(255, 255, 255, 0.87);
-	background-color: #011F5B;
-
-	font-synthesis: none;
 	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
 }
 
 a {
 	font-weight: 500;
-	color: #646cff;
 	text-decoration: inherit;
-}
-a:hover {
-	color: #535bf2;
 }
 
 body {
 	margin: 0;
-	/* display: flex;
-	place-items: center; */
-	min-width: 320px;
 	min-height: 100vh;
+	min-width: 320px;
 }
 
 h1 {
@@ -70,95 +69,76 @@ h1 {
 }
 
 button {
-	border-radius: 8px;
+	background-color: #222222;
 	border: 1px solid transparent;
-	padding: 0.6em 1.2em;
+	border-radius: 8px;
 	color: inherit;
+	cursor: pointer;
 	font-size: 1em;
 	font-weight: 500;
-	font-family: inherit;
-	background-color: #222222;
-	cursor: pointer;
+	padding: 0.6em 1.2em;
 	transition: border-color 0.25s;
 }
 button:hover {
 	border-color: #ffffff;
 }
+button:disabled {
+	cursor: not-allowed;
+}
+button:disabled:hover {
+	border-color: transparent;
+}
 
 .course-card {
-	width: 100%;
-	box-sizing: border-box;
-	overflow: hidden;
-	border: 2px solid #333333;
 	border-radius: 20px;
-	border-width: 3px;
-	background-color: #011F5B;
+	box-sizing: border-box;
 	color: #ededed;
 	cursor: pointer;
+	overflow: hidden;
 	transition: border-color 0.2s ease, transform 0.2s ease;
-  }
-  
-  .course-card:hover {
-	border-color: #777777;
-	transform: translateY(-3px);
-  }
-  
-  .course-card-image {
-	display: block;
 	width: 100%;
+  }
+.course-card:hover {
+	transform: translateY(-3px);
+}
+.course-card-image {
 	aspect-ratio: 16 / 9;
-	object-fit: cover;
 	background-color: #000;
 	border-bottom: 1px solid #383838;
-  }
-  
-  .course-card-content {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+}
+.course-card-content {
 	padding: 20px;
-  }
-  
-  .course-card-content h3 {
-	margin: 0 0 24px;
+}
+.course-card-content h3 {
 	font-size: 22px;
 	font-weight: 600;
 	line-height: 1.4;
-  }
-  
-  .course-card-tags {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 10px;
-  }
-  
-  .course-tag {
-	padding: 3px 10px;
-	border-radius: 8px;
-	background-color: #3d6893;
-	font-size: 16px;
-	line-height: 1.4;
-  }
-  
-  .course-tag-number {
-	background-color: #9b514b;
-  }
-
-  .course-grid {
+	margin: 0 0 24px;
+}
+.course-grid {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 350px));
-	justify-content: center;
 	gap: 2rem;
-  }
-  
-.cart-dialog {
-  width: min(600px, 90vw);
-  max-height: 85vh;
-  padding: 0;
-  border: 1px solid #444;
-  border-radius: 12px;
-  background: #990000;
-  color: #ededed;
-  overflow-y: auto;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 350px));
+	justify-content: center;
 }
 
-.cart-dialog::backdrop {
+.popup-dialog {
+  background: #990000;
+  border: 1px solid #444;
+  border-radius: 12px;
+  color: #ededed;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 0;
+  width: min(600px, 90vw);
+}
+.popup-dialog::backdrop {
   background: rgba(0, 0, 0, 0.65);
+}
+
+@media (max-width: 900px) {
+  .navigation { position: static !important; }
 }
